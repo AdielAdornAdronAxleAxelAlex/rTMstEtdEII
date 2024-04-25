@@ -10,8 +10,56 @@ const { errorResponder, errorTypes } = require('../../../core/errors');
  */
 async function getUsers(request, response, next) {
   try {
-    const users = await usersService.getUsers();
-    return response.status(200).json(users);
+    //extracts the queries
+    const pageNo = request.query.page_number;
+    const pageSize = request.query.page_size;
+    const search = request.query.search;
+    const sort = request.query.sort;
+    
+    //checks if the search and sort fields are valid if not an error will be thrown
+    if(search!=null){
+      const searchField=search.split(':')[0];
+      if (searchField!='email'&&searchField!='name'){
+        throw errorResponder(errorTypes.UNPROCESSABLE_ENTITY,'invalid search field')
+      }
+    }
+
+    //also checks if sortkey is valid or not (asc or desc)
+    if(sort!=null){
+      const [sortField,sortKey]=sort.split(':');
+      if(sortField!='email'&&sortField!='name'){
+        throw errorResponder(errorTypes.UNPROCESSABLE_ENTITY,'invalid sort field')
+      }
+      if(sortKey!='asc'&&sortKey!='desc'){
+        throw errorResponder(errorTypes.UNPROCESSABLE_ENTITY,'invalid sort key')
+      }
+    }
+    
+    let tempRes=null;
+    //checks if pagination is possible
+    if (pageSize!=null&&pageNo!=null){
+      //extracts information needed for pagination
+      const pageCount=Math.ceil((await usersService.userCount(search))/pageSize);
+      const userData=await usersService.getUsers(pageNo,pageSize,search,sort);
+      const prev=await usersService.hasPrev(pageNo);
+      const next=await usersService.hasNext(pageNo,pageCount);
+      const userCounter=await usersService.currPage(pageNo,pageCount,pageSize,search)
+
+      //processes the result
+      tempRes={
+        page_number:pageNo,
+        page_size:pageSize,
+        count:userCounter,
+        total_pages:pageCount,
+        has_previous_page:prev,
+        has_next_page:next,
+        data:userData,
+      };
+    }else{
+      tempRes=await usersService.getUsers(pageNo,pageSize,search,sort);
+    }
+    const result=tempRes;
+    return response.status(200).json(result);
   } catch (error) {
     return next(error);
   }

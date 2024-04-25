@@ -48,4 +48,13 @@ module.exports = {
       password_confirm: joi.string().required().label('Password confirmation'),
     },
   },
+  getUsers:{
+    query:{
+    page_number:joi.number().positive().min(1).optional().label('pageNo'),
+    page_size:joi.number().positive().min(1).optional().label('pageSize'),
+    search:joi.string().regex(/:/).optional().label('search'),
+    sort:joi.string().regex(/:/).optional().label('sort'),
+    //the regex /:/ makes sure that sort and search has a ':'
+    },
+  },
 };

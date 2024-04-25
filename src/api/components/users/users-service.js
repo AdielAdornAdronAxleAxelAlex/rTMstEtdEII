@@ -2,26 +2,6 @@ const usersRepository = require('./users-repository');
 const { hashPassword, passwordMatched } = require('../../../utils/password');
 
 /**
- * Get list of users
- * @returns {Array}
- */
-async function getUsers() {
-  const users = await usersRepository.getUsers();
-
-  const results = [];
-  for (let i = 0; i < users.length; i += 1) {
-    const user = users[i];
-    results.push({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-    });
-  }
-
-  return results;
-}
-
-/**
  * Get user detail
  * @param {string} id - User ID
  * @returns {Object}
@@ -161,6 +141,95 @@ async function changePassword(userId, password) {
   return true;
 }
 
+/**
+ * Get list of users
+ * @param {number} pageNo - current page number
+ * @param {number} pageSize - size of page
+ * @param {string} search - search query/string
+ * @param {string} sort - sort query/string
+ * @returns {Promise}
+ */
+async function getUsers(pageNo, pageSize, search, sort) {
+  const users = await usersRepository.getUsers(pageNo, pageSize, search, sort);
+  const results = [];
+  for (let i = 0; i < users.length; i += 1) {
+    const user = users[i];
+    results.push({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    });
+  }
+
+  return results;
+}
+
+/**
+ * determines if theres a next page
+ * @param {number} pageSize - size of page
+ * @param {number} pageNo - current page number
+ * @returns {boolean}
+ */
+async function hasNext(pageNo, pageCount) {
+  if (pageNo < pageCount) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+/**
+ * determines if theres a previous page
+ * @param {number} pageNo - current page number
+ * @returns {boolean}
+ */
+async function hasPrev(pageNo) {
+  if (pageNo == 1) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
+/**
+ * counts number of users
+ * @param {string} - search query/string
+ * @returns {number}
+ */
+async function userCount(search) {
+  //if search is being performed it will use searchCount instead of userCount
+  if (search!=null){
+    return await usersRepository.searchCount(search);
+  }
+  return await usersRepository.userCount();
+}
+
+/**
+ * counts how many data is in the current page
+ * @param {number} pageNo - current page number
+ * @param {number} pageCount - number of pages
+ * @param {number} pageSize - size of page
+ * @param {string} search - search string/query
+ * @returns {number}
+ */
+async function currPage(pageNo, pageCount, pageSize, search) {
+  if (search != null) {
+    if (pageNo != pageCount) {
+      return pageSize;
+    } else {
+      return (
+        (await usersRepository.searchCount(search)) - pageSize * (pageCount - 1)
+      );
+    }
+  } else {
+    if (pageNo != pageCount) {
+      return pageSize;
+    } else {
+      return (await usersRepository.userCount()) - pageSize * (pageCount - 1);
+    }
+  }
+}
+
 module.exports = {
   getUsers,
   getUser,
@@ -170,4 +239,8 @@ module.exports = {
   emailIsRegistered,
   checkPassword,
   changePassword,
+  hasNext,
+  hasPrev,
+  userCount,
+  currPage,
 };
