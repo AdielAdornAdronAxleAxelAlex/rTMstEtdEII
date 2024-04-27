@@ -8,7 +8,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "migrate": "node ./migrations/20240324121101_create_default_users.js",
     "eslint": "eslint src/**",
-    "fakeGen": "node ./migrations/fakeGen.js"
+    "fakeGen": "node ./migrations/fakeGen.js",
+    "fakeGenM":"node ./migrations/fakeGenM.js",
+    "createDefaultProduct":"node ./migrations/create_default_product.js"
   },
   "author": "Janson Hendryli",
   "license": "ISC",
