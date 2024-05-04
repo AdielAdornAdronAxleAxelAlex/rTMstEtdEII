@@ -1,14 +1,6 @@
 const { User } = require('../../../models');
 
 /**
- * Get a list of users
- * @returns {Promise}
- */
-async function getUsers() {
-  return User.find({});
-}
-
-/**
  * Get user detail
  * @param {string} id - User ID
  * @returns {Promise}
@@ -136,7 +128,7 @@ async function userCount() {
 
 /**
  * counts the total amount of users if search is being performed
- * @param {string} search- search query/string
+ * @param {string} search- search query
  * @returns {promise}
  */
 async function searchCount(search){

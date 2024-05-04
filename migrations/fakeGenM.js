@@ -1,6 +1,6 @@
 //you can ignore this file it is used for generating random products to test functions
 //if you do want to try it it is executed using 'npm run fakeGenM' in the terminal
-//keep in mind it does take some time to execute depending on how many its generating
+//unlike the other fakegen this one doesnt take that long since it doesnt need to hash passwords
 //the amount of products that are generated can be changed by changing the value 'i<int' in the for loop in line 11
 const faker=require('faker');
 const marketRepository = require('../src/api/components/marketplace/market-repository');
@@ -13,7 +13,7 @@ async function fakeGenM(){
     for (let i=0;i<60;i++){
       let product_name=((faker.random.word())+' '+(faker.commerce.product()));
       //i know that there is a chance faker would produce 2 products with the same name so i use
-      //a random to drastically reduce those chances although still possible its very unlikely
+      //a random word to drastically reduce those chances although still possible its very unlikely
       let company_name=faker.company.companyName();
       let country=faker.address.country();
       let price=faker.datatype.number({min:1,max:200});

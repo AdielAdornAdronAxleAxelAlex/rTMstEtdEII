@@ -1,5 +1,14 @@
 const usersRepository = require('./users-repository');
 const { hashPassword, passwordMatched } = require('../../../utils/password');
+//note:since i used the users api as a template for the marketplace api i made for number 3
+//ive noticed when testing said api i got the wrong error messages
+//this is because some of the functions here tried to execute a function from repository such as
+//getUser,getUserByEmail,etc when no id or email matches and because of that it results in the error:
+//Cast to ObjectId failed for value \"noid\" (type string) at path \"_id\" for model \"users\"
+//the cause of this problem is that it executes the function first before it returns null meaning
+//the null will never reach the controller and gives the incorrect error message
+//to fix this all i added was a try and catch to the functions using the previously mentioned repository functions
+
 
 /**
  * Get user detail
@@ -7,18 +16,22 @@ const { hashPassword, passwordMatched } = require('../../../utils/password');
  * @returns {Object}
  */
 async function getUser(id) {
-  const user = await usersRepository.getUser(id);
+  try{
+    const user = await usersRepository.getUser(id);
 
-  // User not found
-  if (!user) {
+    // User not found
+    if (!user) {
+      return null;
+    }
+
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    };
+  }catch (err){
     return null;
   }
-
-  return {
-    id: user.id,
-    name: user.name,
-    email: user.email,
-  };
 }
 
 /**
@@ -49,7 +62,11 @@ async function createUser(name, email, password) {
  * @returns {boolean}
  */
 async function updateUser(id, name, email) {
-  const user = await usersRepository.getUser(id);
+  try{
+    const user = await usersRepository.getUser(id);
+  }catch(err){
+    return null;
+  }
 
   // User not found
   if (!user) {
@@ -71,7 +88,11 @@ async function updateUser(id, name, email) {
  * @returns {boolean}
  */
 async function deleteUser(id) {
-  const user = await usersRepository.getUser(id);
+  try{
+    const user = await usersRepository.getUser(id);
+  }catch(err){
+    return null;
+  }
 
   // User not found
   if (!user) {
@@ -93,7 +114,11 @@ async function deleteUser(id) {
  * @returns {boolean}
  */
 async function emailIsRegistered(email) {
-  const user = await usersRepository.getUserByEmail(email);
+  try{
+    const user = await usersRepository.getUserByEmail(email);
+  }catch(err){
+    return null;
+  }
 
   if (user) {
     return true;
@@ -109,7 +134,12 @@ async function emailIsRegistered(email) {
  * @returns {boolean}
  */
 async function checkPassword(userId, password) {
-  const user = await usersRepository.getUser(userId);
+  try{
+    const user = await usersRepository.getUser(userId);
+  }catch (err){
+    return null;
+  }
+  
   return passwordMatched(password, user.password);
 }
 
@@ -120,7 +150,12 @@ async function checkPassword(userId, password) {
  * @returns {boolean}
  */
 async function changePassword(userId, password) {
-  const user = await usersRepository.getUser(userId);
+  try{
+    const user = await usersRepository.getUser(userId);
+  }catch(err){
+    return null;
+  }
+  
 
   // Check if user not found
   if (!user) {

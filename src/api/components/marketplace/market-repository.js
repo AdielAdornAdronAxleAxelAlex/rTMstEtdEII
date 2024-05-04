@@ -1,14 +1,6 @@
 const { Market } = require('../../../models');
 
 /**
- * Get a list of products
- * @returns {Promise}
- */
-async function getProducts() {
-  return Market.find({});
-}
-
-/**
  * Get product detail
  * @param {string} id - product ID
  * @returns {Promise}
@@ -83,7 +75,7 @@ async function getProductName(product_name) {
 }
 
 /**
- * gets products (modified to handle queries)
+ * gets products
  * @param {number} pageNo - current page number
  * @param {number} pageSize - size of page
  * @param {string} search - search query

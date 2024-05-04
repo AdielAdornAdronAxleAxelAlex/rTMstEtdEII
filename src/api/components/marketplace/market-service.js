@@ -118,8 +118,8 @@ async function isNameTaken(productName) {
  * Get list of products
  * @param {number} pageNo - current page number
  * @param {number} pageSize - size of page
- * @param {string} search - search query/string
- * @param {string} sort - sort query/string
+ * @param {string} search - search query
+ * @param {string} sort - sort query
  * @returns {Array}
  */
 
@@ -169,7 +169,7 @@ async function hasPrev(pageNo) {
 
 /**
  * counts number of products
- * @param {string} - search query/string
+ * @param {string} - search query
  * @returns {number}
  */
 async function productCount(search) {
