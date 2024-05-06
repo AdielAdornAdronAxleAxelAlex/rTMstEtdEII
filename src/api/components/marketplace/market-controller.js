@@ -205,12 +205,15 @@ async function buyProduct(request,response,next){
   try{
     const id=request.params.id;
     const quantity=request.body.quantity;
+    const payment=request.body.payment;
     const finder=await marketService.getProduct(id);
 
     //if no products are found
     if(!finder){
       throw errorResponder(errorTypes.UNPROCESSABLE_ENTITY,'unknown product');
     }
+
+    const totalPrice=(finder.price.replace('$',""))*quantity;
 
     //if the products quantity is 0 an error wil be thrown saying its out of stock
     if(finder.quantity==0){
@@ -222,6 +225,13 @@ async function buyProduct(request,response,next){
     if(finder.quantity<quantity){
       throw errorResponder(errorTypes.UNPROCESSABLE_ENTITY,
         'not enough stock available try buying less current stock is '+finder.quantity);
+    }
+
+    //checks if there is enough payment for purchase if not an error will be thrown
+    if(payment<totalPrice){
+      throw errorResponder(errorTypes.UNPROCESSABLE_ENTITY,
+        'insufficient payment at least '+totalPrice+' is required'
+      )
     }
 
     //calculates what the quantity would be after purchase
@@ -240,8 +250,9 @@ async function buyProduct(request,response,next){
       company_name:finder.company_name,
       price:finder.price,
       quantity_bought:quantity,
-      total_price:'$'+(finder.price.replace("$","")*quantity)
-      //removes the currency symbol for calculation and then reconcenates it after calculation
+      total_price:'$'+totalPrice,
+      payment:'$'+payment,
+      change:'$'+(payment-totalPrice)
     })
   }catch(error){
     return next (error);

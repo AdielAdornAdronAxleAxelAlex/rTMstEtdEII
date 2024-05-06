@@ -35,6 +35,7 @@ module.exports = {
   buyProduct:{
     body:{
       quantity:joi.number().min(1).required().label('quantity'),
+      payment:joi.number().min(1).required().label('payment'),
     }
   },
 
